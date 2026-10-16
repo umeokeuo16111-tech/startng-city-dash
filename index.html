@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>City Dash — start.ng</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <div id="left">
+      <div class="pill" id="coins"><span class="ic"></span><span id="coinN">0</span></div>
+      <div class="pill" id="player">Player&nbsp;<b id="pname">…</b></div>
+    </div>
+    <div class="pill" id="dist">0<small> M</small></div>
+  </div>
+
+  <div id="dock" aria-label="Outfit"></div>
+
+  <div id="overlay">
+    <h1 id="title">CITY<br>DASH</h1>
+    <p id="sub">Run the street, grab coins, dodge the barriers. Pick an outfit below — your runner is dressed from it.</p>
+    <button id="start-btn">Start</button>
+    <div class="keys"><kbd>&larr;</kbd><kbd>&rarr;</kbd> lanes &nbsp;·&nbsp; <kbd>&uarr;</kbd> / swipe up jump</div>
+  </div>
+
+  <!-- three.js (3D library) from a CDN, then our files in order -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="theme.js"></script>
+  <script src="auth.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
