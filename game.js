@@ -13,11 +13,51 @@
   const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   window.applyThemeCSS();
+
+  // ---- who is playing? (real start.ng character) ----
+  const user = await window.getCurrentUser();
+
+  // Show the player's start.ng character in the HUD (face + name)
+  const playerPill = document.getElementById('player');
+  playerPill.innerHTML = (user.face ? '<img id="pface" alt="">' : '') + 'Player&nbsp;<b id="pname"></b>';
+  document.getElementById('pname').textContent = user.loggedIn ? user.name : (user.name || 'Guest') + ' (guest)';
+  if (user.face) document.getElementById('pface').src = user.face;
+
+  // start.ng "central styling": if the player's style gives a colour, make it their outfit
+  const styleColor = (function (s) {
+    const parse = (h) => { h = ('' + h).trim().replace('#', ''); return /^[0-9a-fA-F]{6}$/.test(h) ? parseInt(h, 16) : null; };
+    if (!s) return null;
+    if (typeof s === 'string') return parse(s);
+    if (typeof s === 'object') for (const k of ['color', 'primary', 'shirt', 'main', 'hex', 'accent']) if (s[k] != null) { const c = parse(s[k]); if (c !== null) return c; }
+    return null;
+  })(user.style);
+  if (styleColor !== null) {
+    SKINS.unshift({ key: 'you', name: (user.name ? user.name.split(' ')[0] : 'You'),
+      css: '#' + styleColor.toString(16).padStart(6, '0'), shirt: styleColor, cap: 0xffffff, shorts: (styleColor & 0x7f7f7f) });
+  }
   let skin = SKINS[0];
 
-  // ---- who is playing? (start.ng user — placeholder until wired) ----
-  const user = await window.getCurrentUser();
-  document.getElementById('pname').textContent = user.loggedIn ? user.name : user.name + ' (guest)';
+  // Build a floating badge (their face + name) shown above the runner
+  let badgeTex = null;
+  await new Promise((res) => {
+    const cv = document.createElement('canvas'); cv.width = 256; cv.height = 320;
+    const x = cv.getContext('2d');
+    const draw = (img) => {
+      x.clearRect(0, 0, 256, 320);
+      if (img) {
+        x.save(); x.beginPath(); x.arc(128, 108, 92, 0, Math.PI * 2); x.closePath(); x.clip();
+        x.drawImage(img, 34, 14, 188, 188); x.restore();
+        x.lineWidth = 8; x.strokeStyle = '#ffffff'; x.beginPath(); x.arc(128, 108, 92, 0, Math.PI * 2); x.stroke();
+      }
+      x.font = 'bold 42px system-ui, sans-serif'; x.textAlign = 'center';
+      x.lineWidth = 9; x.strokeStyle = 'rgba(20,30,50,.5)'; x.fillStyle = '#ffffff';
+      const nm = (user.name || 'Guest');
+      x.strokeText(nm, 128, 285); x.fillText(nm, 128, 285);
+      badgeTex = new THREE.CanvasTexture(cv); res();
+    };
+    if (user.face) { const img = new Image(); img.onload = () => draw(img); img.onerror = () => draw(null); img.src = user.face; }
+    else draw(null);
+  });
 
   // ---- renderer / scene ----
   const canvas = document.getElementById('game');
@@ -121,6 +161,10 @@
     shoeL.position.set(0, -0.72, 0.08); shoeL.castShadow = true; parts.legL.add(shoeL);
     parts.legR.add(shoeL.clone());
     runner.add(parts.legL, parts.legR);
+    if (badgeTex) {
+      const badge = new THREE.Sprite(new THREE.SpriteMaterial({ map: badgeTex, transparent: true, depthTest: false }));
+      badge.scale.set(1.7, 2.1, 1); badge.position.set(0, 2.95, 0); runner.add(badge);
+    }
     runner.position.set(LANES[laneIndex], 0, 4.6);
     scene.add(runner);
   }
