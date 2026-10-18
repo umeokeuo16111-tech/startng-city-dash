@@ -16,6 +16,7 @@
 
   // ---- who is playing? (real start.ng character) ----
   const user = await window.getCurrentUser();
+  if (window.CityDashLB && window.CityDashLB.setPlayer) window.CityDashLB.setPlayer(user);
 
   // Show the player's start.ng character in the HUD (face + name)
   const playerPill = document.getElementById('player');
@@ -217,12 +218,15 @@
   }
   function start() { reset(); running = true; overlay.classList.add('hidden'); }
   function end() {
+    if (!running) return;                       // one crash = one score (a second barrier can hit the same frame)
     running = false;
     document.getElementById('title').innerHTML = 'NICE<br>RUN';
     document.getElementById('sub').innerHTML =
       (user.loggedIn ? user.name + ', you' : 'You') + ' reached <b>' + Math.floor(dist) +
       'm</b> and grabbed <b>' + coinN + '</b> coins. New outfit?';
-    startBtn.textContent = 'Run again'; overlay.classList.remove('hidden');
+    startBtn.textContent = 'Run again';
+    if (window.CityDashLB && window.CityDashLB.onRunOver) window.CityDashLB.onRunOver({ distance: dist, coins: coinN });
+    overlay.classList.remove('hidden');
   }
 
   function move(d) { if (running) laneIndex = Math.max(0, Math.min(2, laneIndex + d)); }

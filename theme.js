@@ -29,6 +29,21 @@ window.THEME = {
     skinTone:   0xe8b48c,
     shoe:       0x2b2b2b,
   },
+  // Neon night palette for the leaderboard (and anything else neon),
+  // straight from cover.png: dark navy/purple, neon cyan, hot pink, gold.
+  // Every leaderboard colour comes from here — style.css only uses vars.
+  ui: {
+    bg:       '#0b0f2a',   // deep navy (panel bottom)
+    bg2:      '#1b1449',   // purple (panel top)
+    fg:       '#eaf3ff',   // text on the panel
+    muted:    '#96a2d6',   // secondary text on the panel
+    cyan:     '#3df5ff',   // neon cyan (scores, accents, buttons)
+    pink:     '#ff2d95',   // neon pink (the player's own row)
+    gold:     '#ffcf33',   // trophy gold (title, 1st place, "New best!")
+    rank1:    '#ffcf33',
+    rank2:    '#3df5ff',
+    rank3:    '#ff2d95',
+  },
 };
 
 // Each outfit FULLY describes the runner. Add or edit an entry
@@ -47,4 +62,34 @@ window.applyThemeCSS = function () {
   const hex = (n) => '#' + n.toString(16).padStart(6, '0');
   r.setProperty('--sky', hex(window.THEME.world.sky));
   r.setProperty('--coin', hex(window.THEME.world.coin));
+
+  // Neon leaderboard palette -> CSS variables (the glow/line colours are
+  // derived from the same hexes, so one edit in THEME.ui restyles it all).
+  const ui = window.THEME.ui || {};
+  const rgba = (h, a) => {
+    const s = ('' + h).replace('#', '');
+    if (!/^[0-9a-fA-F]{6}$/.test(s)) return 'rgba(255,255,255,' + a + ')';
+    const n = parseInt(s, 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  };
+  const set = (k, v) => { if (v) r.setProperty(k, v); };
+  set('--lb-bg', ui.bg);
+  set('--lb-bg2', ui.bg2);
+  set('--lb-fg', ui.fg);
+  set('--lb-muted', ui.muted);
+  set('--neon', ui.cyan);
+  set('--pink', ui.pink);
+  set('--gold', ui.gold);
+  set('--rank1', ui.rank1);
+  set('--rank2', ui.rank2);
+  set('--rank3', ui.rank3);
+  set('--neon-line', rgba(ui.cyan, 0.38));
+  set('--neon-glow', rgba(ui.cyan, 0.22));
+  set('--pink-line', rgba(ui.pink, 0.85));
+  set('--pink-glow', rgba(ui.pink, 0.28));
+  set('--gold-glow', rgba(ui.gold, 0.35));
+  set('--lb-row', 'rgba(255,255,255,.055)');
+  set('--lb-me', rgba(ui.pink, 0.14));
+  set('--lb-scrim', 'rgba(5,7,24,.74)');
+  set('--lb-chip', rgba(ui.cyan, 0.18));
 };

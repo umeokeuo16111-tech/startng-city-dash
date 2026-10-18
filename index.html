@@ -24,14 +24,33 @@
   <div id="overlay">
     <h1 id="title">CITY<br>DASH</h1>
     <p id="sub">Run the street, grab coins, dodge the barriers. Pick an outfit below — your runner is dressed from it.</p>
-    <button id="start-btn">Start</button>
+    <div class="ov-actions">
+      <button id="start-btn">Start</button>
+      <button id="lb-btn" aria-haspopup="dialog">🏆 Leaderboard</button>
+    </div>
+    <p id="newbest" hidden>New best!</p>
+    <p id="lb-note"></p>
     <div class="keys"><kbd>&larr;</kbd><kbd>&rarr;</kbd> lanes &nbsp;·&nbsp; <kbd>&uarr;</kbd> / swipe up jump</div>
+  </div>
+
+  <!-- start.ng leaderboard: the top 10, straight from the platform -->
+  <div id="lb-overlay" hidden>
+    <div id="lb-card" role="dialog" aria-modal="true" aria-labelledby="lb-title">
+      <div class="lb-head">
+        <h2 id="lb-title">🏆 Leaderboard</h2>
+        <button id="lb-close" aria-label="Close leaderboard">✕</button>
+      </div>
+      <p id="lb-status">…</p>
+      <ol id="lb-list"></ol>
+      <p id="lb-you" hidden></p>
+    </div>
   </div>
 
   <!-- three.js (3D library) from a CDN, then our files in order -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="theme.js"></script>
   <script src="auth.js"></script>
+  <script src="leaderboard.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
